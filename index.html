@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Bites | Experiência Gastronómica Suprema</title>
+    <!-- Strict Content Security Policy to prevent XSS and injection -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self';">
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Link to external premium styling -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Link to modern client logic -->
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+    <!-- Main Navigation Bar -->
+    <header class="header" id="nav-header">
+        <div class="container nav-container">
+            <a href="#" class="logo" id="logo-home">
+                <svg class="logo-icon" viewBox="0 0 24 24" width="32" height="32">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm-1.5-4c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1.45.45 1.45 1v4.5c0 .55-.45 1-1.45 1zm5.02-4.13c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0a4.99 4.99 0 0 1 0 7.07c-.39.39-1.02.39-1.41 0s-.39-1.02 0-1.41a2.99 2.99 0 0 0 0-4.25z" fill="var(--color-gold)"/>
+                    <path d="M7.48 9.97a1 1 0 0 1-1.41 0 4.99 4.99 0 0 1 0-7.07c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41a2.99 2.99 0 0 0 0 4.25c-.39.39-1.02.39-1.41 0z" fill="var(--color-gold)"/>
+                </svg>
+                <span class="logo-text">Gourmet<span class="logo-highlight">Bites</span></span>
+            </a>
+            
+            <nav class="nav-links" id="main-nav">
+                <a href="#hero" class="nav-link active" id="link-hero">Início</a>
+                <a href="#menu" class="nav-link" id="link-menu">Menu</a>
+                <a href="#customizer" class="nav-link" id="link-customizer">Criar Prato</a>
+                <a href="#story" class="nav-link" id="link-story">O Chef</a>
+                <a href="#reviews" class="nav-link" id="link-reviews">Avaliações</a>
+            </nav>
+            
+            <div class="nav-actions">
+                <!-- Theme Toggle Option -->
+                <button class="theme-toggle" id="theme-toggle-btn" aria-label="Alterar Tema">
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="22" height="22">
+                        <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="22" height="22">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                
+                <!-- Animated Shopping Cart -->
+                <button class="cart-trigger" id="cart-trigger-btn" aria-label="Abrir Carrinho">
+                    <svg class="cart-icon" viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.07 1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+                    </svg>
+                    <span class="cart-badge" id="cart-count-badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Showcase Section -->
+    <section class="hero-section" id="hero">
+        <div class="hero-bg-overlay"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <span class="hero-badge">Alta Gastronomia ao seu dispor</span>
+                <h1 class="hero-title">Sabores <span class="accent-text">Exclusivos</span>,<br>Momentos Inesquecíveis.</h1>
+                <p class="hero-subtitle">Explore o menu assinado pelo Chef, personalize os seus próprios pratos com ingredientes biológicos premium e desfrute de uma experiência gastronómica de excelência, entregue à sua porta.</p>
+                <div class="hero-cta">
+                    <a href="#menu" class="btn btn-primary" id="hero-btn-menu">Explorar Menu</a>
+                    <a href="#customizer" class="btn btn-secondary" id="hero-btn-customizer">Criar Prato</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-plate-container">
+                    <div class="hero-glow"></div>
+                    <svg class="hero-plate" viewBox="0 0 200 200" width="380" height="380">
+                        <circle cx="100" cy="100" r="90" fill="var(--color-surface-card)" stroke="var(--color-border)" stroke-width="2"/>
+                        <circle cx="100" cy="100" r="75" fill="none" stroke="var(--color-gold)" stroke-width="0.5" stroke-dasharray="4 4"/>
+                        <!-- Premium Gourmet Salmon Dish representation -->
+                        <path d="M70 70 C 85 55, 115 55, 130 70 C 145 85, 145 115, 130 130 C 115 145, 85 145, 70 130 C 55 115, 55 85, 70 70 Z" fill="#C85A32" opacity="0.9"/>
+                        <path d="M80 80 C 90 70, 110 70, 120 80 C 130 90, 130 110, 120 120 C 110 130, 90 130, 80 120 C 70 110, 70 90, 80 80 Z" fill="#E88A62"/>
+                        <!-- Asparagus and herbs -->
+                        <rect x="75" y="95" width="50" height="8" rx="4" transform="rotate(-30 100 100)" fill="#4A752C"/>
+                        <rect x="75" y="105" width="50" height="8" rx="4" transform="rotate(-15 100 100)" fill="#5A8F39"/>
+                        <!-- Lemon slice -->
+                        <circle cx="100" cy="70" r="12" fill="#E6C845"/>
+                        <circle cx="100" cy="70" r="10" fill="#FFF" opacity="0.6"/>
+                        <!-- Gourmet Sauce drops -->
+                        <circle cx="130" cy="80" r="4" fill="var(--color-gold)"/>
+                        <circle cx="140" cy="95" r="5" fill="var(--color-gold)"/>
+                        <circle cx="138" cy="115" r="3" fill="var(--color-gold)"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Highlights / Features Section -->
+    <section class="features-section">
+        <div class="container features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z" opacity="0"/>
+                        <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.07 19.55 10.47 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-1-8h2v5h-2zm0-3h2v2h-2z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Ingredientes Biológicos</h3>
+                <p class="feature-desc">Utilizamos exclusivamente matérias-primas selecionadas de produtores locais sustentáveis.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" opacity="0"/>
+                        <path d="M11 9H9V2H7v7H5V2H3v7c0 2.21 1.79 4 4 4v9h2v-9c2.21 0 4-1.79 4-4V2h-2v7zm4-4v6c0 1.86 1.28 3.41 3 3.86V22h2V14.86c1.72-.45 3-2 3-3.86V5c0-1.66-1.34-3-3-3s-5 1.34-5 3z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Chef's Signature</h3>
+                <p class="feature-desc">Cada receita é um equilíbrio perfeito entre criatividade moderna e técnicas culinárias tradicionais.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                        <path d="M20 8h-3V4H3v12h2v4h10v-4h3l4-4V8h-2zm-5 10H7v-2h8v2zm3-4H5V6h10v8h3v1.17L19.83 14H18v-2z" opacity="0"/>
+                        <path d="M20 8h-3V4H3v12h2v4h10v-4h3l4-4V8h-2zm-5 10H7v-2h8v2zm3-4H5V6h10v8h3v1.17L19.83 14H18v-2z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Experiência Hot & Fresh</h3>
+                <p class="feature-desc">Caixas de entrega térmicas inovadoras garantem que a refeição chega à sua mesa na temperatura perfeita.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gourmet Menu Section -->
+    <section class="menu-section" id="menu">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Menu do Dia</span>
+                <h2 class="section-title">Explorar Delícias Gastronómicas</h2>
+                <div class="section-divider"></div>
+            </div>
+            
+            <!-- Category Tabs Controls -->
+            <div class="menu-tabs" id="menu-tabs-container">
+                <button class="menu-tab active" data-category="all" id="tab-all">Todos</button>
+                <button class="menu-tab" data-category="starters" id="tab-starters">Entradas</button>
+                <button class="menu-tab" data-category="mains" id="tab-mains">Pratos Principais</button>
+                <button class="menu-tab" data-category="desserts" id="tab-desserts">Sobremesas</button>
+                <button class="menu-tab" data-category="drinks" id="tab-drinks">Bebidas</button>
+            </div>
+            
+            <!-- Menu Grid - Populated dynamically via app.js -->
+            <div class="menu-grid" id="menu-items-grid">
+                <!-- Javascript will load the items securely here using textContent & DOM elements -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Chef's Plate Customizer Section -->
+    <section class="customizer-section" id="customizer">
+        <div class="customizer-bg-pattern"></div>
+        <div class="container">
+            <div class="section-header text-center">
+                <span class="section-tag">Cozinha Interativa</span>
+                <h2 class="section-title">Crie a Sua Obra-Prima</h2>
+                <p class="section-subtitle">Selecione uma base requintada, uma proteína nobre e guarnições gourmet para compor um prato exclusivo à sua medida.</p>
+                <div class="section-divider"></div>
+            </div>
+            
+            <div class="customizer-wrapper">
+                <!-- Plate Interactive Preview (Left side) -->
+                <div class="customizer-preview">
+                    <div class="plate-base-shadow"></div>
+                    <div class="plate-canvas" id="plate-visual-canvas">
+                        <!-- Ceramic Plate Core -->
+                        <div class="ceramic-plate">
+                            <div class="ceramic-inner-ring"></div>
+                        </div>
+                        
+                        <!-- Dynamically generated ingredient layers will go here -->
+                        <div class="ingredient-layer-container" id="active-layers-box">
+                            <div class="empty-plate-text" id="empty-plate-alert">Escolha ingredientes à direita para começar a criar a sua obra-prima</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-price-box">
+                        <span class="price-label">Preço Total Estimado</span>
+                        <span class="price-val" id="customizer-total-price">12.00 €</span>
+                    </div>
+                </div>
+                
+                <!-- Plate Customizer Panel (Right side) -->
+                <div class="customizer-panel">
+                    <form id="customizer-selection-form" onsubmit="event.preventDefault();">
+                        <!-- Group 1: Base Selection -->
+                        <div class="custom-group">
+                            <h4 class="group-title"><span class="step-num">1</span> Selecione a Base <span class="required-badge">Obrigatório</span></h4>
+                            <div class="custom-options-grid" id="base-options-box">
+                                <!-- Loaded dynamically via app.js -->
+                            </div>
+                        </div>
+                        
+                        <!-- Group 2: Protein Selection -->
+                        <div class="custom-group">
+                            <h4 class="group-title"><span class="step-num">2</span> Selecione a Proteína <span class="required-badge">Obrigatório</span></h4>
+                            <div class="custom-options-grid" id="protein-options-box">
+                                <!-- Loaded dynamically via app.js -->
+                            </div>
+                        </div>
+                        
+                        <!-- Group 3: Toppings Selection -->
+                        <div class="custom-group">
+                            <h4 class="group-title"><span class="step-num">3</span> Escolha as Guarnições <span class="optional-badge">Opcional</span></h4>
+                            <div class="custom-options-grid" id="topping-options-box">
+                                <!-- Loaded dynamically via app.js -->
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="customizer-actions">
+                            <button type="button" class="btn btn-secondary btn-full" id="btn-reset-plate">Limpar Prato</button>
+                            <button type="button" class="btn btn-primary btn-full" id="btn-add-plate-to-cart">Adicionar Criação ao Carrinho</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chef's Philosophy Section -->
+    <section class="story-section" id="story">
+        <div class="container story-grid">
+            <div class="story-visual">
+                <div class="story-img-container">
+                    <div class="story-glow"></div>
+                    <!-- Modern vector/CSS chef representation -->
+                    <div class="chef-illustration">
+                        <div class="chef-hat">
+                            <svg viewBox="0 0 100 100" width="120" height="120" fill="currentColor">
+                                <path d="M50 15c-11 0-20 9-20 20v2h40v-2c0-11-9-20-20-20z" fill="var(--color-gold)" opacity="0.2"/>
+                                <path d="M50 20c-15.46 0-28 12.54-28 28 0 4.19.92 8.16 2.58 11.75C21.73 60.59 20 62.59 20 65c0 2.76 2.24 5 5 5h50c2.76 0 5-2.24 5-5 0-2.41-1.73-4.41-4.58-5.25C77.08 56.16 78 52.19 78 48c0-15.46-12.54-28-28-28zm0 46H26c-1.1 0-2-.9-2-2s.9-2 2-2h4c1.1 0 2-.9 2-2V48c0-12.13 9.87-22 22-22s22 9.87 22 22v12c0 1.1.9 2 2 2h4c1.1 0 2 .9 2 2s-.9 2-2 2H50zm12-18h-4v-4c0-1.1-.9-2-2-2s-2 .9-2 2v4h-4c-1.1 0-2 .9-2 2s.9 2 2 2h4v4c0 1.1.9 2 2 2s2-.9 2-2v-4h4c1.1 0 2-.9 2-2s-.9-2-2-2z" fill="var(--color-gold)"/>
+                            </svg>
+                        </div>
+                        <div class="chef-quote-overlay">
+                            <p class="chef-quote">"A comida não alimenta apenas o corpo, alimenta a alma e liga as pessoas."</p>
+                            <span class="chef-name">— Chef Ricardo Monteiro</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="story-content">
+                <span class="section-tag">A nossa Essência</span>
+                <h2 class="section-title">Alta Cozinha com Compromisso</h2>
+                <div class="section-divider"></div>
+                <p class="story-paragraph">O Gourmet Bites nasceu do desejo de redefinir o conceito de entrega de refeições ao domicílio. Combinando a mestria da cozinha de autor com técnicas contemporâneas de conservação térmica, asseguramos que cada prato preserva as texturas e os aromas ideais até chegar à sua mesa.</p>
+                <p class="story-paragraph">Utilizamos apenas ingredientes fornecidos por cooperativas locais ecológicas. Todos os peixes são de pesca sustentável regulamentada e as carnes têm certificação de bem-estar animal.</p>
+                
+                <div class="story-badges">
+                    <div class="story-badge-item">
+                        <span class="badge-number">100%</span>
+                        <span class="badge-label">Fresco e Ecológico</span>
+                    </div>
+                    <div class="story-badge-item">
+                        <span class="badge-number">5 Estrelas</span>
+                        <span class="badge-label">Chef de Prestígio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Reviews Carousel Section -->
+    <section class="reviews-section" id="reviews">
+        <div class="container">
+            <div class="section-header text-center">
+                <span class="section-tag">Depoimentos</span>
+                <h2 class="section-title">O que dizem os nossos Clientes</h2>
+                <div class="section-divider"></div>
+            </div>
+            
+            <!-- Dynamic Testimonials Container -->
+            <div class="reviews-slider-outer">
+                <button class="slider-arrow arrow-left" id="reviews-prev-btn" aria-label="Avaliação Anterior">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                
+                <div class="reviews-viewport">
+                    <div class="reviews-track" id="reviews-track-container">
+                        <!-- Inserted dynamically via JavaScript using safe DOM tools -->
+                    </div>
+                </div>
+                
+                <button class="slider-arrow arrow-right" id="reviews-next-btn" aria-label="Próxima Avaliação">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="slider-dots" id="reviews-dots-box">
+                <!-- Javascript dots -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Sidebar Shopping Cart Drawer -->
+    <div class="cart-backdrop" id="cart-drawer-backdrop"></div>
+    <aside class="cart-drawer" id="cart-drawer-container" aria-label="Carrinho de Compras">
+        <div class="cart-header">
+            <h3 class="cart-title">O Seu Pedido</h3>
+            <button class="cart-close" id="cart-close-btn" aria-label="Fechar Carrinho">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Cart Contents -->
+        <div class="cart-body" id="cart-items-list">
+            <!-- Dynamic list of items added dynamically -->
+        </div>
+        
+        <!-- Cart Footer -->
+        <div class="cart-footer">
+            <!-- Coupon Code Form -->
+            <div class="coupon-section">
+                <div class="coupon-input-group">
+                    <input type="text" id="coupon-field" class="form-control" placeholder="Código de desconto (Ex: GOURMET20)" autocomplete="off">
+                    <button type="button" class="btn btn-secondary" id="coupon-apply-btn">Aplicar</button>
+                </div>
+                <div class="coupon-feedback" id="coupon-alert-msg"></div>
+            </div>
+            
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">0.00 €</span>
+                </div>
+                <div class="summary-row" id="coupon-discount-row" style="display: none;">
+                    <span class="discount-label">Desconto <span id="applied-coupon-name"></span></span>
+                    <span class="discount-val" id="coupon-discount-val">-0.00 €</span>
+                </div>
+                <div class="summary-row">
+                    <span>Taxa de Entrega</span>
+                    <span id="cart-shipping">2.50 €</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span id="cart-total-price">2.50 €</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-full checkout-btn" id="btn-checkout-trigger">Confirmar e Finalizar Pedido</button>
+        </div>
+    </aside>
+
+    <!-- Elegant Glassmorphic Checkout Modal -->
+    <div class="modal-backdrop" id="checkout-modal-backdrop"></div>
+    <div class="checkout-modal" id="checkout-modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button class="modal-close" id="checkout-close-btn" aria-label="Fechar Modal">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+        
+        <div class="modal-content-wrapper" id="modal-step-form">
+            <h3 class="modal-title" id="modal-title">Finalizar Encomenda</h3>
+            <p class="modal-subtitle">Insira as informações de entrega e pagamento para concluir o seu pedido gourmet.</p>
+            
+            <form id="checkout-billing-form" onsubmit="event.preventDefault();">
+                <div class="form-group">
+                    <label for="checkout-name" class="form-label">Nome Completo</label>
+                    <input type="text" id="checkout-name" class="form-control" placeholder="Ex: Maria Silveira" required>
+                </div>
+                <div class="form-group">
+                    <label for="checkout-address" class="form-label">Endereço de Entrega</label>
+                    <input type="text" id="checkout-address" class="form-control" placeholder="Ex: Av. da Liberdade, nº 100, Lisboa" required>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="checkout-phone" class="form-label">Telemóvel</label>
+                        <input type="tel" id="checkout-phone" class="form-control" placeholder="Ex: 912345678" pattern="[9][1236][0-9]{7}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout-payment" class="form-label">Método de Pagamento</label>
+                        <select id="checkout-payment" class="form-control" required>
+                            <option value="mbway">MB Way</option>
+                            <option value="card">Cartão de Crédito/Débito</option>
+                            <option value="cash">Dinheiro na Entrega</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Simulated payment fields (conditionally styled in CSS/JS) -->
+                <div class="payment-fields-box" id="credit-card-details" style="display: none;">
+                    <div class="form-group">
+                        <label for="card-num" class="form-label">Número do Cartão</label>
+                        <input type="text" id="card-num" class="form-control" placeholder="4000 1234 5678 9010" maxlength="19">
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="card-expiry" class="form-label">Validade</label>
+                            <input type="text" id="card-expiry" class="form-control" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="card-cvv" class="form-label">CVV</label>
+                            <input type="password" id="card-cvv" class="form-control" placeholder="***" maxlength="3">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-summary-compact">
+                    <span>Total a Pagar: </span>
+                    <strong class="total-highlight-val" id="modal-summary-total">0.00 €</strong>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full" id="btn-submit-order">Confirmar Pagamento e Pedido</button>
+            </form>
+        </div>
+        
+        <!-- Multi-step Success Screen -->
+        <div class="modal-content-wrapper success-screen" id="modal-step-success" style="display: none;">
+            <div class="success-icon-wrapper">
+                <svg class="success-checkmark" viewBox="0 0 52 52">
+                    <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="success-check-path" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+            <h3 class="success-title">Pedido Confirmado!</h3>
+            <p class="success-desc">Agradecemos a sua preferência. O Chef Ricardo já começou a preparar a sua obra-prima gastronómica.</p>
+            
+            <!-- Live Progress Bar -->
+            <div class="order-status-box">
+                <div class="status-steps">
+                    <span class="status-step active" id="step-prep">Cozinha</span>
+                    <span class="status-step" id="step-delivery">Entrega</span>
+                    <span class="status-step" id="step-arrived">Entregue</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="order-progress-loader"></div>
+                </div>
+                <span class="status-helper-text" id="order-status-msg">O seu prato está na grelha...</span>
+            </div>
+            
+            <button class="btn btn-primary btn-full" id="btn-success-close">Voltar ao Menu</button>
+        </div>
+    </div>
+
+    <!-- Dynamic Toast Notification Container -->
+    <div class="toast-container" id="toast-manager-container"></div>
+    
+</body>
+</html>
