@@ -1,48 +1,57 @@
-# Gourmet Bites 🍽️ | Alta Gastronomia ao seu Dispor
+# Delta Upselling ☕ | Sistema Operacional Delta Coffee House
 
-Bem-vindo ao **Gourmet Bites**, uma aplicação web single-page (SPA) de alta performance e visual premium, focada na encomenda de pratos gourmet e na personalização interativa de criações do Chef com ingredientes biológicos de produtores locais sustentáveis.
+Bem-vindo ao **Delta Upselling**, um sistema operacional e POS companion de alto desempenho para a equipa da **Delta Coffee House - Avenida da Liberdade**. Desenvolvido com uma interface moderna, interativa e focado na otimização de vendas e gestão eficiente de equipas.
 
-Este projeto foi construído do zero com foco em **excelência de design (UX/UI)**, **interatividade viva** e **segurança avançada** (com uma política CSP rígida e proteção integrada contra injeções de script XSS).
+Este projeto foi construído utilizando as mais recentes tecnologias web com foco em **excelência de design (UX/UI)**, **sugestões inteligentes em tempo real** e **gestão operacional rigorosa**.
 
 ---
 
 ## ✨ Funcionalidades Principais
 
-*   **🎨 Experiência Estética Premium (Dark Mode Default)**: Design sofisticado, tipografia elegante (fontes *Outfit* e *Playfair Display* da Google Fonts) e estética de vidro polido (*glassmorphism*) adaptada tanto para modos escuros como claros.
-*   **🍕 Criador de Pratos Interativo ("Obra-Prima do Chef")**: Permite selecionar bases, proteínas e guarnições gourmet num formulário integrado que gera representações dinâmicas sobre um prato cerâmico virtual, calculando os custos estimados em tempo real.
-*   **🍜 Menu Gourmet Dinâmico**: Menu dividido por abas com filtros rápidos animados (Entradas, Pratos Principais, Sobremesas, Bebidas) e cartões detalhados.
-*   **🛒 Carrinho Lateral Deslizante**: Painel fluido para gerir quantidades, aplicar códigos promocionais (ex: `GOURMET20` para 20% de desconto) e recalcular taxas automaticamente.
-*   **💳 Checkout em Vidro Fluido (Simulação Dinâmica)**: Formulário elegante com validações inteligentes e formatador em tempo real de dados de pagamento (MB Way / Cartão de Crédito).
-*   **🚚 Acompanhamento de Pedido Progressivo**: Um ecrã de sucesso que simula a preparação pelo Chef e a rota de entrega em tempo real através de uma barra de progresso viva.
-*   **🔔 Sistema de Notificações Toast**: Toast de alertas flutuantes e elegantes para interações e feedback das ações do utilizador.
-*   **🔒 Segurança Nativa Extrema**: Arquitetura livre de manipulações de string inseguras (`innerHTML`) que mitiga por completo riscos de XSS, com uma Content Security Policy (CSP) integrada.
+*   **🧠 Motor de Upselling Inteligente (Sugestões Delta)**:
+    *   **Destaques do Mês**: Campanhas automáticas e integradas para impulsionar os objetivos mensais (ex: *Focaccia de Burrata* e *Blue Latte*) com frases de venda personalizadas.
+    *   **Experiência Sensorial (Especialidades de Café)**: Sugere upgrades silenciosos de *Café Espresso* para métodos de extração premium (*V60 Pour-Over* ou *Chemex* para partilha), melhorando a experiência do cliente.
+    *   **Cruzamento de Bebidas Refrescantes**: Recomendações dinâmicas de bebidas ácidas ou tropicais para acompanhar refeições pesadas como Hambúrgueres ou Saladas.
+*   **📅 Matriz de Escala e Horários Estrita**:
+    *   **Roster de 22 Colaboradores**: Gestão e alocação de postos em tempo real baseada no perfil e nas competências de cada funcionário.
+    *   **Motor de Rotação de Folgas**: Algoritmo que garante estritamente 2 folgas semanais por funcionário, respeitando a escala e prevenindo que as duas *Hostess* estejam de folga no mesmo domingo.
+    *   **Regras de Farda e Higiene**: Bloqueio estrito que impede que colaboradores BoH (*Back of House*, ex: Cozinheiros e Copeiros) cubram posições FoH (*Front of House*), mantendo a conformidade com normas institucionais.
+*   **⏰ Gestão Dinâmica de Horários e Alertas**:
+    *   Acompanhamento em tempo real do estado operacional (Abertura, Serviço Normal, Cozinha Encerrada, Fecho, Fora de Horário).
+    *   **Bloqueio de Cozinha**: Desativação inteligente da adição de pratos quentes/frios após o horário de encerramento antecipado da cozinha, permitindo apenas bebidas e sacos de café.
+    *   **Contingência de Cozinha**: Alertas visuais e sonoros automáticos em caso de tempos de espera elevados para pratos específicos.
+*   **📊 Métricas de Performance & SLAs**:
+    *   Painel detalhado com acompanhamento de faturados, taxa de conversão de upselling (meta ≥ 30%) e receitas adicionais.
+    *   Monitorização de SLAs operacionais por posto (ex: Barista, Caixa, Cozinheiro, Runner) com base em timestamps de fluxo de comanda.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-1.  **HTML5 Semântico**: Estrutura robusta e acessível.
-2.  **Vanilla CSS3**: Design system modular baseado em CSS Custom Properties (Variáveis), transições suaves e animações baseadas em `@keyframes` otimizadas para GPU.
-3.  **Vanilla JavaScript (ES6+)**: Gestão de estado na memória, manipulação dinâmica e segura do DOM utilizando APIs estruturadas (`document.createElement` / `replaceChildren` / `DOMParser`).
+1.  **React 19 & TypeScript**: Aplicação robusta de tipagem estrita para segurança de dados e interfaces reativas.
+2.  **TanStack Start & Router**: Framework de última geração para routing dinâmico e carregamento de dados eficiente.
+3.  **TailwindCSS v4**: Design system moderno com transições polidas, animações GPU-optimized e suporte a temas.
+4.  **Lucide React**: Biblioteca de ícones moderna e consistente.
+5.  **Sonner**: Sistema de notificações toast fluidos e não obstrutivos.
 
 ---
 
-## 🛠️ Como Iniciar Localmente
+## 🛠️ Como Executar Localmente
 
-Para correr o projeto na sua máquina local, não necessita de nenhuma base de dados ou dependência pesada.
+O projeto está configurado utilizando o gestor de pacotes moderno Bun.
 
-1.  Clone este repositório ou faça download da pasta do projeto.
-2.  Abra o ficheiro [index.html](index.html) diretamente no seu navegador de preferência ou, preferencialmente, corra-o utilizando uma extensão de servidor local (como *Live Server* do VS Code ou `npx serve .`).
-3.  **Nota**: Devido à política rígida de segurança CSP configurada para bloquear inline scripts e proteger o site de ataques, o projeto deve ser executado num contexto de servidor Web local para melhor compatibilidade de recursos adicionais.
-
-### 🎫 Cupão de Teste
-Experimente adicionar itens ao carrinho e aplique o seguinte cupão na secção de descontos para ver o cálculo dinâmico:
-*   `GOURMET20` — Garante **20% de desconto** imediato sobre o subtotal!
+1.  Instale as dependências:
+    ```bash
+    bun install
+    ```
+2.  Inicie o servidor de desenvolvimento:
+    ```bash
+    bun run dev
+    ```
+3.  Aceda à aplicação no seu navegador em `http://localhost:3000`.
 
 ---
 
 ## 📜 Licença
 
-Este projeto está licenciado sob a licença MIT. Sinta-se à vontade para utilizar, estudar ou estender o código!
-
-Desenvolvido com 💛 por [Pedro Monteiro](https://github.com/PedroMonteiro94).
+Desenvolvido para **Delta Coffee House - Avenida da Liberdade** por [Pedro Monteiro](https://github.com/PedroMonteiro94).
