@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { GoalsProvider } from "@/lib/goals";
 import { OrdersProvider } from "@/lib/orders";
+import { IrisWrapper } from "@/components/IrisWrapper";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,7 @@ function RootComponent() {
       <GoalsProvider>
         <OrdersProvider>
           <Outlet />
+          <IrisWrapper />
         </OrdersProvider>
       </GoalsProvider>
     </QueryClientProvider>
