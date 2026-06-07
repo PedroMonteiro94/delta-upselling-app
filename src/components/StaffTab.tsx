@@ -84,31 +84,85 @@ function AllocationPanel({ registeredUsers }: { registeredUsers: string[] }) {
   const onShift = ROSTER.filter((m) => !isOff(m, today));
   const off = ROSTER.filter((m) => isOff(m, today));
 
+  const { users, assignPosto, isLeader } = useGoals();
+
+  // Active alocations mapped by member name
+  const currentAlocations = useMemo(() => {
+    const map: Record<string, string> = {};
+    users.forEach((u) => {
+      if (u.postoId) map[u.name] = u.postoId;
+    });
+    return map;
+  }, [users]);
+
   // Quem está em sala hoje (posto frente loja)
-  const salaCount = onShift.filter((m) => m.posto === "sala").length;
-  const baristaCount = onShift.filter((m) => m.posto === "barista").length;
+  const salaCount = onShift.filter((m) => currentAlocations[m.nome] === "sala" || (!currentAlocations[m.nome] && m.posto === "sala")).length;
+  const baristaCount = onShift.filter((m) => currentAlocations[m.nome] === "barista" || (!currentAlocations[m.nome] && m.posto === "barista")).length;
+
+  const handleStationChange = (memberName: string, value: string) => {
+    assignPosto(memberName, value || undefined);
+    toast.success(`Alocação de ${memberName} atualizada!`);
+  };
+
+  const handleRotation = () => {
+    // Rotate kitchen staff (Quentes -> Frios -> Produção -> Copa -> Quentes)
+    const kitchenUsers = users.filter(
+      (u) => ["cozinha-quentes", "cozinha-frios", "cozinha-producao", "cozinha-copa"].includes(u.postoId || "") && !u.archived
+    );
+
+    if (kitchenUsers.length === 0) {
+      toast.error("Nenhum colaborador alocado aos postos da cozinha para rodar.");
+      return;
+    }
+
+    const nextPostMap: Record<string, string> = {
+      "cozinha-quentes": "cozinha-frios",
+      "cozinha-frios": "cozinha-producao",
+      "cozinha-producao": "cozinha-copa",
+      "cozinha-copa": "cozinha-quentes",
+    };
+
+    kitchenUsers.forEach((u) => {
+      const nextPost = nextPostMap[u.postoId || ""];
+      if (nextPost) {
+        assignPosto(u.name, nextPost);
+      }
+    });
+
+    toast.success("🔄 Rotação pós-pausa realizada com sucesso na cozinha!");
+  };
 
   // Motor de sugestões: regras simples
-  const suggestions: { member: StaffMember; suggest: string; reason: string }[] = onShift.map((m) => {
+  const suggestions: { member: StaffMember; suggest: string; suggestId: string; reason: string }[] = onShift.map((m) => {
     let suggest = POSTO_LABEL[m.posto];
+    let suggestId = m.posto;
     let reason = `Posto habitual: ${POSTO_LABEL[m.posto]}.`;
 
     // Reforço de sala: se < 3 elementos em sala, sugere desviar barista extra OU caixa
     if (salaCount < 3 && (m.posto === "barista" && baristaCount > 2)) {
       suggest = "Sala (reforço)";
+      suggestId = "sala";
       reason = `Sala com apenas ${salaCount} elemento(s). Farda FoH compatível — pode reforçar a frente.`;
     } else if (salaCount < 3 && m.posto === "responsavel") {
       suggest = "Sala (cobertura)";
+      suggestId = "sala";
       reason = `Responsável cobre lacuna em sala (${salaCount} disponíveis). Farda FoH OK.`;
     }
 
-    // Bloqueio estrito de farda BoH
+    // Bloqueio estrito de farda BoH e direcionamento para os postos específicos da cozinha
     if (!isFoH(m.posto)) {
-      suggest = POSTO_LABEL[m.posto];
-      reason = `Farda institucional ${m.posto === "cozinheiro" ? "de Cozinheiro" : "de Copeiro"} — bloqueio higiénico/imagem: NUNCA fora da cozinha.`;
+      if (m.posto === "cozinheiro") {
+        suggest = "Cozinha Quente / Chapa";
+        suggestId = "cozinha-quentes";
+        reason = "Cozinheiro - farda BoH estrita. Sugere-se alocar a Quentes.";
+      } else {
+        suggest = "Copa / Lavagem";
+        suggestId = "cozinha-copa";
+        reason = "Copeiro - farda BoH estrita. Sugere-se alocar a Copa.";
+      }
     }
 
-    return { member: m, suggest, reason };
+    return { member: m, suggest, suggestId, reason };
   });
 
   return (
@@ -118,13 +172,27 @@ function AllocationPanel({ registeredUsers }: { registeredUsers: string[] }) {
         <Stat icon={AlertTriangle} label="De folga" value={off.length} tone="warn" />
       </div>
 
-      <h3 className="mt-5 text-[10px] uppercase tracking-widest text-muted-foreground">
-        Sugestões de alocação · {today.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "short" })}
-      </h3>
+      <div className="flex items-center justify-between mt-5">
+        <h3 className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          Sugestões de alocação · {today.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "short" })}
+        </h3>
+        {isLeader && (
+          <button
+            onClick={handleRotation}
+            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-accent border border-accent/20 bg-accent/5 px-2.5 py-1.5 rounded-xl hover:bg-accent/10 active:scale-95 transition-all"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Rotação Cozinha
+          </button>
+        )}
+      </div>
+
       <ul className="mt-2 space-y-2">
-        {suggestions.map(({ member, suggest, reason }) => {
+        {suggestions.map(({ member, suggest, suggestId, reason }) => {
           const Icon = POSTO_ICON[member.posto];
           const isAssigned = registeredUsers.includes(member.nome);
+          const currentPostId = currentAlocations[member.nome] || "";
+          
           return (
             <li key={member.id} className="rounded-2xl border border-border bg-card p-3">
               <div className="flex items-start gap-3">
@@ -145,16 +213,48 @@ function AllocationPanel({ registeredUsers }: { registeredUsers: string[] }) {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     {POSTO_LABEL[member.posto]} · farda {member.farda}
                   </p>
-                  <p className="mt-1.5 text-xs">
-                    <span className="font-semibold text-foreground">→ {suggest}</span>
-                  </p>
+                  
+                  <div className="mt-2 text-xs">
+                    <span className="text-muted-foreground">Sugestão:</span>{" "}
+                    <span className="font-semibold text-foreground">{suggest}</span>
+                  </div>
                   <p className="mt-0.5 text-[11px] text-muted-foreground italic">{reason}</p>
+
+                  {/* Station Selector */}
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Posto:</span>
+                    <select
+                      value={currentPostId}
+                      onChange={(e) => handleStationChange(member.nome, e.target.value)}
+                      className="text-xs rounded-lg border border-border bg-secondary px-2.5 py-1.5 focus:border-accent outline-none"
+                    >
+                      <option value="">Não Alocado (Padrão)</option>
+                      {member.farda === "BoH" ? (
+                        <>
+                          <option value="cozinha-quentes">🔥 Cozinha Quente</option>
+                          <option value="cozinha-frios">❄️ Cozinha Fria</option>
+                          <option value="cozinha-producao">🥗 Produção / Prep</option>
+                          <option value="cozinha-copa">🧼 Copa / Lavagem</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="sala">👥 Sala</option>
+                          <option value="barista">☕ Barista</option>
+                          <option value="caixa">💰 Caixa</option>
+                          <option value="hostess">💁 Hostess</option>
+                          <option value="runner">🏃 Runner</option>
+                          <option value="responsavel">🛡️ Responsável</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
                 </div>
+
                 <button
-                  onClick={() => toast.success(`${member.nome} alocado a ${suggest}`)}
-                  className="rounded-lg bg-success px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-success-foreground"
+                  onClick={() => handleStationChange(member.nome, suggestId)}
+                  className="rounded-lg bg-success px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-success-foreground shrink-0 active:scale-95"
                 >
-                  Alocar
+                  Auto Alocar
                 </button>
               </div>
             </li>

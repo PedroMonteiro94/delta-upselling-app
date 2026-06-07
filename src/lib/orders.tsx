@@ -11,6 +11,8 @@ import type { MenuItem } from "@/data/menu";
 import { pracaOf, type Praca } from "@/lib/classify";
 
 const KEY = "delta_orders_v1";
+const COPA_KEY = "delta_copa_tasks_v1";
+const PRODUCAO_KEY = "delta_producao_tasks_v1";
 
 export type LineStatus = "registado" | "entregue" | "pago";
 
@@ -37,6 +39,20 @@ export interface OpenOrder {
   lines: OrderLine[];
 }
 
+export interface CopaTask {
+  id: string;
+  desc: string;
+  status: "registado" | "completo";
+  registadoAt: number;
+}
+
+export interface ProducaoTask {
+  id: string;
+  desc: string;
+  status: "registado" | "completo";
+  registadoAt: number;
+}
+
 interface OrdersContext {
   orders: OpenOrder[];
   activeOrderId: string | null;
@@ -57,11 +73,16 @@ interface OrdersContext {
     lineId: string,
     item: { id: string; nome: string; preco: number; subcategoria: any; categoria: any }
   ) => void;
-
   closeOrder: (orderId: string) => void;
   removeOrder: (orderId: string) => void;
   hotQueueAvgMs: number;
   hotContingency: boolean;
+  copaTasks: CopaTask[];
+  producaoTasks: ProducaoTask[];
+  completeCopaTask: (id: string) => void;
+  completeProducaoTask: (id: string) => void;
+  addCopaTask: (desc: string) => void;
+  addProducaoTask: (desc: string) => void;
 }
 
 const Ctx = createContext<OrdersContext | null>(null);
@@ -77,12 +98,54 @@ function read(): OpenOrder[] {
 export function OrdersProvider({ children }: { children: ReactNode }) {
   const [orders, setOrders] = useState<OpenOrder[]>([]);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
-
-  useEffect(() => setOrders(read()), []);
+  const [copaTasks, setCopaTasks] = useState<CopaTask[]>([]);
+  const [producaoTasks, setProducaoTasks] = useState<ProducaoTask[]>([]);
 
   const persist = useCallback((list: OpenOrder[]) => {
     setOrders(list);
     localStorage.setItem(KEY, JSON.stringify(list));
+  }, []);
+
+  const persistCopa = useCallback((list: CopaTask[]) => {
+    setCopaTasks(list);
+    localStorage.setItem(COPA_KEY, JSON.stringify(list));
+  }, []);
+
+  const persistProducao = useCallback((list: ProducaoTask[]) => {
+    setProducaoTasks(list);
+    localStorage.setItem(PRODUCAO_KEY, JSON.stringify(list));
+  }, []);
+
+  useEffect(() => {
+    setOrders(read());
+
+    // Load Copa tasks
+    const cachedCopa = localStorage.getItem(COPA_KEY);
+    if (cachedCopa) {
+      setCopaTasks(JSON.parse(cachedCopa));
+    } else {
+      const initialCopa: CopaTask[] = [
+        { id: "c-1", desc: "Limpeza: Lavar copos e pratos da Mesa 1", status: "registado", registadoAt: Date.now() - 300000 },
+        { id: "c-2", desc: "Limpeza: Lavar talheres e jarra da Mesa 3", status: "registado", registadoAt: Date.now() - 120000 },
+      ];
+      setCopaTasks(initialCopa);
+      localStorage.setItem(COPA_KEY, JSON.stringify(initialCopa));
+    }
+
+    // Load Produção tasks
+    const cachedProd = localStorage.getItem(PRODUCAO_KEY);
+    if (cachedProd) {
+      setProducaoTasks(JSON.parse(cachedProd));
+    } else {
+      const initialProd: ProducaoTask[] = [
+        { id: "p-1", desc: "Prep: Preparar Mistura para Panquecas (5L)", status: "registado", registadoAt: Date.now() - 600000 },
+        { id: "p-2", desc: "Prep: Cortar fatias de Bacon para grelha (2kg)", status: "registado", registadoAt: Date.now() - 400000 },
+        { id: "p-3", desc: "Prep: Guacamole fresco (1kg)", status: "registado", registadoAt: Date.now() - 200000 },
+        { id: "p-4", desc: "Prep: Moer grãos de café de Especialidade", status: "registado", registadoAt: Date.now() - 50000 },
+      ];
+      setProducaoTasks(initialProd);
+      localStorage.setItem(PRODUCAO_KEY, JSON.stringify(initialProd));
+    }
   }, []);
 
   const openOrder = useCallback(
@@ -160,6 +223,7 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
           }),
         };
       });
+
       persist(next);
       return result;
     },
@@ -185,10 +249,51 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     [orders, persist]
   );
 
+  const addCopaTask = useCallback((desc: string) => {
+    const task: CopaTask = {
+      id: `c-${Date.now()}`,
+      desc,
+      status: "registado",
+      registadoAt: Date.now()
+    };
+    persistCopa([...copaTasks, task]);
+  }, [copaTasks, persistCopa]);
+
+  const addProducaoTask = useCallback((desc: string) => {
+    const task: ProducaoTask = {
+      id: `p-${Date.now()}`,
+      desc,
+      status: "registado",
+      registadoAt: Date.now()
+    };
+    persistProducao([...producaoTasks, task]);
+  }, [producaoTasks, persistProducao]);
+
   const closeOrder = useCallback(
     (orderId: string) => {
+      const order = orders.find((o) => o.id === orderId);
       persist(orders.map((o) => (o.id === orderId ? { ...o, closedAt: Date.now() } : o)));
       if (activeOrderId === orderId) setActiveOrderId(null);
+
+      // Auto queue Copa task for tables (mesa > 0)
+      if (order && order.mesa > 0) {
+        // We defer it slightly to access correct updated state or append to list
+        const task: CopaTask = {
+          id: `c-${Date.now()}`,
+          desc: `Limpeza: Lavar loiça da Mesa ${order.mesa}`,
+          status: "registado",
+          registadoAt: Date.now()
+        };
+        // Read directly from storage to prevent stale closure state
+        try {
+          const currentCopa: CopaTask[] = JSON.parse(localStorage.getItem(COPA_KEY) || "[]");
+          const nextCopa = [...currentCopa, task];
+          setCopaTasks(nextCopa);
+          localStorage.setItem(COPA_KEY, JSON.stringify(nextCopa));
+        } catch {
+          setCopaTasks(prev => [...prev, task]);
+        }
+      }
     },
     [orders, persist, activeOrderId]
   );
@@ -200,6 +305,16 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     },
     [orders, persist, activeOrderId]
   );
+
+  const completeCopaTask = useCallback((id: string) => {
+    const next = copaTasks.map(t => t.id === id ? { ...t, status: "completo" as const } : t);
+    persistCopa(next);
+  }, [copaTasks, persistCopa]);
+
+  const completeProducaoTask = useCallback((id: string) => {
+    const next = producaoTasks.map(t => t.id === id ? { ...t, status: "completo" as const } : t);
+    persistProducao(next);
+  }, [producaoTasks, persistProducao]);
 
   const activeOrder = useMemo(
     () => orders.find((o) => o.id === activeOrderId) ?? null,
@@ -227,11 +342,16 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
     addLine,
     advanceLine,
     swapLineItem,
-
     closeOrder,
     removeOrder,
     hotQueueAvgMs,
     hotContingency,
+    copaTasks,
+    producaoTasks,
+    completeCopaTask,
+    completeProducaoTask,
+    addCopaTask,
+    addProducaoTask
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

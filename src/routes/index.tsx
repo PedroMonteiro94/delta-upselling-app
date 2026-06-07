@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { MapPin, Trophy, Users, AlertTriangle, Lock, UserCog } from "lucide-react";
+import { MapPin, Trophy, Users, AlertTriangle, Lock, UserCog, GlassWater, Wrench } from "lucide-react";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { categories, menu, type Category, type MenuItem, type Subcategory } from "@/data/menu";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { UpsellSheet, type UpsellSuggestion } from "@/components/UpsellSheet";
+import { CoffeeCustomizerSheet } from "@/components/CoffeeCustomizerSheet";
 import { BottomNav, type Tab } from "@/components/BottomNav";
 import { GoalsModal } from "@/components/GoalsModal";
 import { UserManagementModal } from "@/components/UserManagementModal";
@@ -26,14 +27,23 @@ import { isKitchenOpen, operationalLabel } from "@/lib/schedule";
 const GOAL_FOCACCIA_ID = "focaccia-burrata";
 const GOAL_BLUE_LATTE_ID = "blue-latte";
 
+function isPratoPesado(item: MenuItem): boolean {
+  if (item.subcategoria === "Hamburguers") return true;
+  if (item.subcategoria === "Ovos" && item.id !== "iogurte-granola") return true;
+  if (["prego", "club-sandwich", "focaccia-mortadela"].includes(item.id)) return true;
+  return false;
+}
+
 function pickGoalSuggestion(item: MenuItem): UpsellSuggestion | null {
   const isFoc = /^focaccia-/.test(item.id);
   const isBlue = item.id === GOAL_BLUE_LATTE_ID;
-  const noBlueLatte = item.subcategoria === "Hamburguers" || item.subcategoria === "Saladas";
-  // Se o pedido já É um goal item, sugere o outro goal
-  let goalId = item.categoria === "Refeições" && !noBlueLatte ? GOAL_BLUE_LATTE_ID : GOAL_FOCACCIA_ID;
-  if (isFoc) goalId = GOAL_BLUE_LATTE_ID;
+  const heavy = isPratoPesado(item);
+  
+  if (heavy) return null; // Heavy dishes will get fresh juices instead of Blue Latte / Focaccia
+  
+  let goalId = GOAL_BLUE_LATTE_ID;
   if (isBlue) goalId = GOAL_FOCACCIA_ID;
+  
   if (goalId === item.id) return null;
   const g = menu.find((m) => m.id === goalId);
   if (!g) return null;
@@ -141,6 +151,7 @@ function App() {
   const [activeCat, setActiveCat] = useState<Category>("Refeições");
   const [activeSub, setActiveSub] = useState<Subcategory>("Hamburguers");
   const [upsellItem, setUpsellItem] = useState<MenuItem | null>(null);
+  const [customizerItem, setCustomizerItem] = useState<MenuItem | null>(null);
   const [tab, setTab] = useState<Tab>("menu");
   const [goalsOpen, setGoalsOpen] = useState(false);
   const [mgmtOpen, setMgmtOpen] = useState(false);
@@ -179,6 +190,17 @@ function App() {
       toast.error("Cozinha encerrada · só bebidas e sacos de café disponíveis");
       return;
     }
+    const isCoffeeItem =
+      item.categoria === "Cafetaria" &&
+      (item.subcategoria === "Café em Espresso" ||
+        item.subcategoria === "Café de Filtro" ||
+        (item.subcategoria === "Campanhas" && !item.id.startsWith("saco-")));
+
+    if (isCoffeeItem) {
+      setCustomizerItem(item);
+      return;
+    }
+
     const orderId = ensureOrder();
     if (!orderId) return;
     addLine(orderId, item, { ownerUser: user?.name });
@@ -192,14 +214,44 @@ function App() {
     setUpsellItem(item);
   };
 
+  const handleConfirmCustomizer = (grain: any, milk: any) => {
+    if (!customizerItem) return;
+    const orderId = ensureOrder();
+    if (!orderId) return;
+
+    // Create customized item
+    const customId = `${customizerItem.id}__${grain.id}__${milk?.id ?? 'plain'}`;
+    const customName = `${customizerItem.nome} [${grain.nome}${milk ? `, ${milk.nome}` : ""}]`;
+    const customPrice = customizerItem.preco + grain.adicional + (milk?.adicional ?? 0);
+
+    const customItem = {
+      ...customizerItem,
+      id: customId,
+      nome: customName,
+      preco: customPrice,
+    };
+
+    addLine(orderId, customItem, { ownerUser: user?.name });
+
+    // Capture last line ID for silent experience switch (upselling)
+    queueMicrotask(() => {
+      const ord = orders.find((o) => o.id === orderId);
+      const line = ord?.lines.find((l) => l.itemId === customId && l.status === "registado");
+      setLastLineId(line?.id ?? null);
+    });
+
+    setUpsellItem(customItem);
+    setCustomizerItem(null);
+  };
+
   const upsellSuggestions = useMemo<UpsellSuggestion[]>(() => {
     if (!upsellItem) return [];
     // Café em Espresso (consumo em sala): experiência sensorial — troca silenciosa para V60/Chemex.
     if (upsellItem.subcategoria === "Café em Espresso") {
       return espressoExperienceSuggestions();
     }
-    // Hamburguers e Saladas: só bebidas refrescantes (limonada em destaque)
-    if (upsellItem.subcategoria === "Hamburguers" || upsellItem.subcategoria === "Saladas") {
+    // Pratos pesados (hambúrgueres, sandes pesadas, ovos): só bebidas refrescantes (sumos frescos em destaque)
+    if (isPratoPesado(upsellItem) || upsellItem.subcategoria === "Saladas") {
       return refreshingDrinksSuggestions(upsellItem);
     }
     const list: UpsellSuggestion[] = [];
@@ -413,7 +465,15 @@ function App() {
         {tab === "staff" && <StaffTab />}
         {tab === "metrics" && <MetricsPanel />}
         {tab === "tips" && <RewardsPanel />}
+        {tab === "bar" && <BarTab handleItemTap={handleItemTap} />}
+        {tab === "maintenance" && <MaintenanceTab />}
       </main>
+
+      <CoffeeCustomizerSheet
+        item={customizerItem}
+        onConfirm={handleConfirmCustomizer}
+        onDismiss={() => setCustomizerItem(null)}
+      />
 
       <UpsellSheet
         item={upsellItem}
@@ -440,8 +500,126 @@ function App() {
         onChange={setTab}
         orderCount={orderCount}
         isLeader={isLeader}
+        isGerente={isGerente}
         hotAlert={hotContingency}
       />
     </div>
+  );
+}
+
+const BAR_ITEMS = [
+  { id: "aperol-spritz", nome: "Aperol Spritz", preco: 12.0, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "spritz-delta", nome: "Spritz Delta da Casa", preco: 8.5, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "porto-tonico", nome: "Porto Tónico", preco: 14.0, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "mimosa", nome: "Mimosa", preco: 10.0, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "espresso-martini", nome: "Espresso Martini", preco: 10.0, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "vinho-branco", nome: "Vinho Branco da Casa", preco: 4.5, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "drink-limonada-hortela", nome: "Limonada c/ Hortelã", preco: 3.2, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "drink-abacaxi-coco", nome: "Sumo de Abacaxi & Côco", preco: 4.2, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "sumo-laranja", nome: "Sumo de Laranja Natural", preco: 3.8, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+  { id: "why-not-soda", nome: "Craft Soda [WHY NOT]", preco: 4.0, categoria: "Refeições" as const, subcategoria: "Sandes e Foccacias" as const, pairing: { nome: "", frase_venda: "", preco: 0 } },
+];
+
+function BarTab({ handleItemTap }: { handleItemTap: (item: any) => void }) {
+  return (
+    <section className="space-y-4">
+      <div>
+        <h2 className="font-display text-2xl flex items-center gap-2">
+          <GlassWater className="h-6 w-6 text-accent" />
+          Menu de Bebidas & Bar
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Registo rápido de bebidas frescas, refrigerantes e cocktails
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        {BAR_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              handleItemTap(item);
+              toast.success(`${item.nome} adicionado`);
+            }}
+            className="flex flex-col text-left p-4 bg-card border border-border rounded-2xl hover:bg-secondary/40 active:scale-[0.98] transition-all shadow-[var(--shadow-card)]"
+          >
+            <span className="font-semibold text-sm text-foreground truncate w-full">{item.nome}</span>
+            <span className="text-xs font-bold text-accent mt-2">{item.preco.toFixed(2)} €</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MaintenanceTab() {
+  const handleReset = () => {
+    if (confirm("Tens a certeza que desejas apagar todos os dados operacionais (LocalStorage)?")) {
+      localStorage.clear();
+      toast.success("Dados operacionais reiniciados. Recarrega a página.");
+      window.location.reload();
+    }
+  };
+
+  const handleSeed = () => {
+    localStorage.removeItem("delta_demo_initialized_v1");
+    toast.success("Dados de demonstração reiniciados!");
+    window.location.reload();
+  };
+
+  // Mock security audit log
+  const auditLogs = [
+    { time: "20:12", event: "Login bem-sucedido", user: "Ana Costa", detail: "Papel: Gerente. IP: 192.168.1.45" },
+    { time: "19:45", event: "Rotação de Postos da Cozinha", user: "Ana Costa", detail: "Quentes -> Frios -> Produção -> Copa" },
+    { time: "19:30", event: "Fecho de Turno / Caixa", user: "Pedro Oliveira", detail: "Comanda o-3 fechada e paga" },
+    { time: "19:15", event: "Criação de Utilizador", user: "Pedro Oliveira", detail: "Novo colaborador 'João Antunes' adicionado" },
+    { time: "18:00", event: "Persistência global efectuada", user: "Sistema", detail: "Backup de LocalStorage sincronizado com sucesso" },
+  ];
+
+  return (
+    <section className="space-y-6">
+      <div>
+        <h2 className="font-display text-2xl flex items-center gap-2 text-destructive">
+          <Wrench className="h-6 w-6" />
+          Menu de Manutenção & Zeladoria
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Painel restrito à Gerência · Auditoria e Ações de Sistema
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Ações Rápidas de Sistema</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={handleSeed}
+            className="rounded-xl bg-accent text-accent-foreground px-4 py-3 text-xs font-semibold hover:bg-accent/90 active:scale-95 transition-all"
+          >
+            Repor Dados de Demo
+          </button>
+          <button
+            onClick={handleReset}
+            className="rounded-xl bg-destructive text-destructive-foreground px-4 py-3 text-xs font-semibold hover:bg-destructive/90 active:scale-95 transition-all"
+          >
+            Limpar Todo o Armazenamento
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Registo de Auditoria de Segurança</h3>
+        <div className="space-y-2.5 max-h-[200px] overflow-y-auto pr-1">
+          {auditLogs.map((log, index) => (
+            <div key={index} className="text-[11px] border-b border-border/40 pb-2 flex items-start justify-between">
+              <div>
+                <p className="font-semibold text-foreground">{log.event}</p>
+                <p className="text-muted-foreground mt-0.5">{log.detail} · Por {log.user}</p>
+              </div>
+              <span className="font-mono text-muted-foreground shrink-0">{log.time}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

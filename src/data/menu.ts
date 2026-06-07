@@ -852,3 +852,45 @@ export const menu: MenuItem[] = [
     },
   },
 ];
+
+export interface GrainOption {
+  id: string;
+  nome: string;
+  descricao: string;
+  adicional: number;
+}
+
+export interface MilkOption {
+  id: string;
+  nome: string;
+  adicional: number;
+}
+
+export const GRAINS: GrainOption[] = [
+  { id: "grain-che2", nome: "Delta CHE2", descricao: "Combinação clássica robusta/arábica com cacau/avelã", adicional: 0.0 },
+  { id: "grain-heritage", nome: "Delta Heritage", descricao: "Blend asiático com notas de cacau e noz", adicional: 0.0 },
+  { id: "grain-toki", nome: "Impossible Toki", descricao: "Cafés Impossible - notas florais e citrinas vibrantes", adicional: 1.0 },
+  { id: "grain-tolima", nome: "Impossible Tolima", descricao: "Cafés Impossible - perfil doce de caramelo e chocolate", adicional: 1.0 },
+  { id: "grain-impossible-java", nome: "Impossible Java", descricao: "Cafés Impossible - encorpado, terroso e picante", adicional: 1.0 },
+  { id: "grain-impossible-moka", nome: "Impossible Moka", descricao: "Cafés Impossible - aromático, frutado com bagas silvestres", adicional: 1.0 },
+  { id: "grain-ethiopia", nome: "Etiópia Yirgacheffe", descricao: "Single-Origin - acidez floral, jasmim e limão", adicional: 0.5 },
+  { id: "grain-colombia", nome: "Colômbia Excelso", descricao: "Single-Origin - notas de caramelo e frutos vermelhos", adicional: 0.5 },
+  { id: "grain-brazil", nome: "Brasil Sul de Minas", descricao: "Single-Origin - doce, acidez baixa, avelã e chocolate", adicional: 0.5 },
+  { id: "grain-kenya", nome: "Quénia AA", descricao: "Single-Origin - encorpado com acidez cítrica e groselha", adicional: 0.5 },
+  { id: "grain-india", nome: "Índia Malabar", descricao: "Single-Origin - encorpado, notas de especiarias e chocolate", adicional: 0.5 },
+];
+
+export const MILK_ALTERNATIVES: MilkOption[] = [
+  { id: "milk-aveia", nome: "Leite de Aveia", adicional: 0.5 },
+  { id: "milk-amendoa", nome: "Leite de Amêndoa", adicional: 0.5 },
+  { id: "milk-coco", nome: "Leite de Côco", adicional: 0.5 },
+  { id: "milk-semlactose", nome: "Leite Sem Lactose", adicional: 0.3 },
+  { id: "milk-soja", nome: "Leite de Soja", adicional: 0.3 },
+];
+
+export const MILK_EXTRAS: MilkOption[] = [
+  { id: "milk-extra-quente", nome: "Leite Quente à parte", adicional: 0.4 },
+  { id: "milk-extra-frio", nome: "Leite Frio à parte", adicional: 0.4 },
+  { id: "milk-extra-espuma", nome: "Extra Espuma de Leite", adicional: 0.2 },
+];
+
